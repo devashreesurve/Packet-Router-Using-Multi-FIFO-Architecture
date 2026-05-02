@@ -10,30 +10,30 @@ The project includes:
 
 ---
 
-## 🧠 Key Features
+## Key Features
 
-* ✅ **3-Port Router Architecture**
-* ✅ **FIFO-based buffering (per port)**
-* ✅ **Round-Robin Arbitration (fair scheduling)**
-* ✅ **Backpressure handling (ready/valid protocol)**
-* ✅ **Self-checking Testbench (scoreboard-based)**
-* ✅ **Latency measurement**
-* ✅ **Random + Directed + Stress Testing**
-* ✅ **Cadence simulation compatible**
+*  **3-Port Router Architecture**
+*  **FIFO-based buffering (per port)**
+*  **Round-Robin Arbitration (fair scheduling)**
+*  **Backpressure handling (ready/valid protocol)**
+*  **Self-checking Testbench (scoreboard-based)**
+*  **Latency measurement**
+*  **Random + Directed + Stress Testing**
+*  **Cadence simulation compatible**
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
-### 🔷 Block Diagram
+###  Block Diagram
 
 <img width="1024" height="559" alt="gsfg" src="https://github.com/user-attachments/assets/9210928f-27f2-4426-bfc7-65dda482ded2" />
 
 ---
 
-## 🔍 Module Description
+##  Module Description
 
-### 📦 FIFO Module
+###  FIFO Module
 
 * Synchronous FIFO
 * Parameterized width and depth
@@ -45,7 +45,7 @@ The project includes:
 
 ---
 
-### 🔀 Router Module
+###  Router Module
 
 * Routes packets based on destination bits:
 
@@ -61,7 +61,7 @@ dest = data_in[7:6]
 
 ---
 
-### ⚖️ Round Robin Arbiter
+###  Round Robin Arbiter
 
 * Ensures fair access to output
 * Priority rotates:
@@ -72,7 +72,7 @@ FIFO0 → FIFO1 → FIFO2 → FIFO0
 
 ---
 
-### 🔄 Flow Control
+###  Flow Control
 
 * `valid_in` → indicates valid data
 * `ready_out` → prevents overflow
@@ -80,27 +80,27 @@ FIFO0 → FIFO1 → FIFO2 → FIFO0
 
 ---
 
-## 🧪 Verification Strategy
+##  Verification Strategy
 
 The testbench includes:
 
-### ✔ Driver
+###  Driver
 
 * Sends packets with:
 
   * Directed inputs
   * Random traffic
 
-### ✔ Scoreboard
+###  Scoreboard
 
 * Tracks expected vs actual output
 * Detects mismatches
 
-### ✔ Latency Measurement
+###  Latency Measurement
 
 * Measures time between send and receive
 
-### ✔ Test Cases
+###  Test Cases
 
 | Test Type      | Description                      |
 | -------------- | -------------------------------- |
@@ -114,7 +114,7 @@ The testbench includes:
 
 ---
 
-## 📊 Expected Behavior
+##  Expected Behavior
 
 * Data is written into the correct FIFO based on destination
 * Round-robin arbiter selects FIFO outputs fairly
@@ -124,9 +124,9 @@ The testbench includes:
 
 ---
 
-## 🖥️ Simulation
+##  Simulation
 
-### 🛠 Tools Used
+###  Tools Used
 
 * Cadence Xcelium (xrun)
 * SimVision (Waveform Viewer)
@@ -139,7 +139,7 @@ The testbench includes:
 <img width="4729" height="6783" alt="rre" src="https://github.com/user-attachments/assets/dc2f9874-f29a-4c2d-812a-c947ee6b503c" />
 
 
-## ⚠️ Limitations
+##  Limitations
 
 * Synchronous FIFO only (no CDC)
 * Fixed 3-port design (not scalable yet)
@@ -147,7 +147,7 @@ The testbench includes:
 
 ---
 
-## 🚀 Future Improvements
+##  Future Improvements
 
 * 🔁 Asynchronous FIFO (CDC handling)
 * 🔁 Parameterized N-port router
@@ -158,7 +158,7 @@ The testbench includes:
 
 ---
 
-## 🎯 Learning Outcomes
+##  Learning Outcomes
 
 * Digital design using Verilog
 * FIFO architecture and buffering
@@ -169,7 +169,7 @@ The testbench includes:
 
 ---
 
-## 📌 Applications
+##  Applications
 
 * Network-on-Chip (NoC)
 * On-chip communication systems
@@ -178,7 +178,7 @@ The testbench includes:
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
 **Devashree Surve**
 VLSI / Electronics Engineering Student
