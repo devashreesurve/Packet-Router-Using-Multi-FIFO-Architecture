@@ -149,12 +149,12 @@ The testbench includes:
 
 ##  Future Improvements
 
-* 🔁 Asynchronous FIFO (CDC handling)
-* 🔁 Parameterized N-port router
-* 🔁 UVM-based verification
-* 🔁 Functional coverage
-* 🔁 Pipeline optimization
-* 🔁 AXI/AHB interface integration
+*  Asynchronous FIFO (CDC handling)
+*  Parameterized N-port router
+*  UVM-based verification
+*  Functional coverage
+*  Pipeline optimization
+*  AXI/AHB interface integration
 
 ---
 
