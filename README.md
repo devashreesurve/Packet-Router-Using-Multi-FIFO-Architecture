@@ -1,185 +1,224 @@
-# 3-Port-Router-Design-using-Multi-FIFO-Architecture
-This project implements a 3-port packet-based router using FIFO buffering and round-robin arbitration in Verilog. The design mimics a simplified Network-on-Chip (NoC) router, supporting parallel data transfer and fair scheduling across multiple output ports.
+# RTL Packet Router using Multi-FIFO Architecture
+---
 
-The project includes:
+# Overview
 
-* RTL design (Verilog)
-* Self-checking testbench
-* Functional verification using simulation
-* Latency measurement and stress testing
+This project implements a packet router in Verilog HDL using multiple FIFO buffers and a Round-Robin arbitration scheme for fair packet scheduling.
+
+Incoming packets are routed to one of three FIFO queues based on the destination field contained in the packet header. A Round-Robin arbiter services the FIFOs to ensure fair access and prevent starvation during simultaneous traffic conditions.
+
+The design follows a modular RTL architecture and was functionally verified using a self-checking Verilog testbench. Directed, random, burst, and stress tests were performed to validate functionality, latency, and robustness.
 
 ---
 
-## Key Features
+# Features
 
-*  **3-Port Router Architecture**
-*  **FIFO-based buffering (per port)**
-*  **Round-Robin Arbitration (fair scheduling)**
-*  **Backpressure handling (ready/valid protocol)**
-*  **Self-checking Testbench (scoreboard-based)**
-*  **Latency measurement**
-*  **Random + Directed + Stress Testing**
-*  **Cadence simulation compatible**
-
----
-
-##  Architecture
-
-###  Block Diagram
-
-<img width="1024" height="559" alt="gsfg" src="https://github.com/user-attachments/assets/9210928f-27f2-4426-bfc7-65dda482ded2" />
+- RTL implementation in Verilog HDL
+- Three independent synchronous FIFO queues
+- Destination-based packet routing
+- Round-Robin arbitration
+- Backpressure handling
+- Parameterized FIFO design
+- Cadence Xcelium compatible
 
 ---
 
-##  Module Description
-
-###  FIFO Module
-
-* Synchronous FIFO
-* Parameterized width and depth
-* Supports:
-
-  * Write enable (`wr_en`)
-  * Read enable (`rd_en`)
-  * Full / Empty flags
-
----
-
-###  Router Module
-
-* Routes packets based on destination bits:
+# Router Architecture
 
 ```
-dest = data_in[7:6]
+                Packet Input
+                     │
+                     ▼
+          Destination Decoder
+                     │
+      ┌──────────────┼──────────────┐
+      │              │              │
+      ▼              ▼              ▼
+   FIFO 0         FIFO 1         FIFO 2
+      │              │              │
+      └──────────────┼──────────────┘
+                     ▼
+         Round-Robin Arbiter
+                     │
+                     ▼
+             Registered Output
 ```
-
-| Destination | Output Port |
-| ----------- | ----------- |
-| 00          | FIFO 0      |
-| 01          | FIFO 1      |
-| 10          | FIFO 2      |
 
 ---
 
-###  Round Robin Arbiter
+# FIFO Architecture
 
-* Ensures fair access to output
-* Priority rotates:
+Each FIFO contains:
+
+- Memory Array
+- Read Pointer
+- Write Pointer
+- Occupancy Counter
+- Full Flag
+- Empty Flag
+
+The FIFO is implemented as a synchronous circular buffer with parameterized depth and data width.
+
+---
+
+# Packet Format
+
+The destination is encoded in the upper two bits of the packet.
+
+| Destination Bits | Selected FIFO |
+|------------------|---------------|
+| 00 | FIFO 0 |
+| 01 | FIFO 1 |
+| 10 | FIFO 2 |
+
+---
+
+# Interface
+
+## Inputs
+
+| Signal | Description |
+|---------|-------------|
+| clk | System Clock |
+| rst | Active High Reset |
+| data_in | Input Packet |
+| valid_in | Input Packet Valid |
+| ready_in | Downstream Ready |
+
+## Outputs
+
+| Signal | Description |
+|---------|-------------|
+| data_out | Routed Packet |
+| valid_out | Output Valid |
+| ready_out | Router Ready |
+
+---
+
+# Flow Control
+
+The router implements a Ready/Valid handshake protocol.
+
+- valid_in indicates a valid incoming packet.
+- ready_out prevents FIFO overflow.
+- ready_in allows downstream modules to control packet consumption.
+- valid_out indicates valid output data.
+
+This enables reliable packet transfer while supporting backpressure.
+
+---
+
+# Arbitration
+
+A Round-Robin scheduler services the FIFO queues.
+
+Priority rotates after every successful transfer.
 
 ```
 FIFO0 → FIFO1 → FIFO2 → FIFO0
 ```
 
----
+Benefits:
 
-###  Flow Control
-
-* `valid_in` → indicates valid data
-* `ready_out` → prevents overflow
-* `ready_in` → controls output consumption
+- Fair scheduling
+- No starvation
+- Balanced throughput
 
 ---
 
-##  Verification Strategy
+# Verification
 
-The testbench includes:
+A self-checking Verilog testbench was developed to verify router functionality.
 
-###  Driver
+Components include:
 
-* Sends packets with:
-
-  * Directed inputs
-  * Random traffic
-
-###  Scoreboard
-
-* Tracks expected vs actual output
-* Detects mismatches
-
-###  Latency Measurement
-
-* Measures time between send and receive
-
-###  Test Cases
-
-| Test Type      | Description                      |
-| -------------- | -------------------------------- |
-| Basic Test     | Single packet per port           |
-| Random Test    | Random destinations and payloads |
-| Burst Test     | Continuous traffic to one port   |
-| Same Dest Test | Stress single FIFO               |
-| Round Robin    | Validates fairness               |
-| Backpressure   | Tests ready_in = 0               |
-| Stress Test    | High-load random traffic         |
+- Driver
+- Monitor
+- Scoreboard
+- Reference Model
+- Latency Measurement
 
 ---
 
-##  Expected Behavior
+# Test Cases
 
-* Data is written into the correct FIFO based on destination
-* Round-robin arbiter selects FIFO outputs fairly
-* Output data matches input data
-* Latency varies based on FIFO occupancy
-* No data loss under normal conditions
-
----
-
-##  Simulation
-
-###  Tools Used
-
-* Cadence Xcelium (xrun)
-* SimVision (Waveform Viewer)
-* EDA PLAYGROUND(VERIFICATION)
+| Test | Purpose |
+|------|---------|
+| Basic Test | Single packet routing |
+| Directed Test | Known packet destinations |
+| Random Test | Random traffic generation |
+| Burst Test | Continuous packet stream |
+| Same Destination Test | FIFO stress |
+| Round-Robin Test | Fairness validation |
+| Backpressure Test | Ready signal validation |
+| Stress Test | High-load traffic |
 
 ---
 
-## Output
-<img width="3275" height="4729" alt="ff" src="https://github.com/user-attachments/assets/6755bcfd-2a62-403b-bcc4-51040a838672" />
-<img width="4729" height="6783" alt="rre" src="https://github.com/user-attachments/assets/dc2f9874-f29a-4c2d-812a-c947ee6b503c" />
+# Results
 
+The RTL successfully demonstrated:
 
-##  Limitations
+- Correct destination decoding
+- Reliable FIFO buffering
+- Fair Round-Robin scheduling
+- Accurate packet delivery
+- Stable operation under burst traffic
+- No packet loss during functional testing
 
-* Synchronous FIFO only (no CDC)
-* Fixed 3-port design (not scalable yet)
-* Basic arbitration (can be enhanced)
+---
+# Tools
+
+- Verilog HDL
+- Cadence Xcelium
+- SimVision
 
 ---
 
-##  Future Improvements
+# Applications
 
-*  Asynchronous FIFO (CDC handling)
-*  Parameterized N-port router
-*  UVM-based verification
-*  Functional coverage
-*  Pipeline optimization
-*  AXI/AHB interface integration
-
----
-
-##  Learning Outcomes
-
-* Digital design using Verilog
-* FIFO architecture and buffering
-* Arbitration techniques (round robin)
-* Verification using testbench
-* Debugging using waveforms
-* Simulation using Cadence tools
+- Network-on-Chip (NoC)
+- System-on-Chip (SoC)
+- Packet Switching
+- Embedded Communication Systems
+- Digital Interconnect Design
 
 ---
 
-##  Applications
+# Future Improvements
 
-* Network-on-Chip (NoC)
-* On-chip communication systems
-* Packet switching networks
-* Embedded system interconnects
+- Asynchronous FIFO
+- Parameterized N-port Router
+- AXI-Stream Interface
+- AHB/APB Integration
+- UVM Testbench
+- SystemVerilog Assertions
+- Functional Coverage
+- QoS-based Arbitration
 
 ---
 
-##  Author
+# Skills Demonstrated
+
+- RTL Design
+- Verilog HDL
+- FIFO Design
+- Packet Routing
+- Round-Robin Arbitration
+- Digital Logic Design
+- Functional Verification
+- Self-Checking Testbench
+- Cadence Simulation
+- Hardware Debugging
+
+---
+
+# Author
 
 **Devashree Surve**
-VLSI / Electronics Engineering Student
 
+Electronics Engineering (VLSI Design & Technology)
+
+Interested in RTL Design • FPGA Design • ASIC Verification
+
+---
