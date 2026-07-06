@@ -126,20 +126,6 @@ Benefits:
 
 ---
 
-# Verification
-
-A self-checking Verilog testbench was developed to verify router functionality.
-
-Components include:
-
-- Driver
-- Monitor
-- Scoreboard
-- Reference Model
-- Latency Measurement
-
----
-
 # Test Cases
 
 | Test | Purpose |
